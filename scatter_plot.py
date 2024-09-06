@@ -7,37 +7,39 @@ from math import *
 class Scatter_plot:
     def __init__(self):
         self.column = []
-        self.argv = sys.argv
+        self.x_feature = 0
+        self.y_feature = 0
         self.data = {}
         self.res = {}
+        self.header = []
         
+    def setArg(self):
+        self.x_feature = self.header.index(sys.argv[1])
+        self.y_feature = self.header.index(sys.argv[2])
+           
     def parser(self):
-        print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] file.csv")
-        if len(self.argv) != 2:
-            print("[Error] Need 1 or 2 args ...")
-            sys.exit()
+        print("[Command] ./python3 scatter_plot.py classe classe")
             
-        with open('datasets/dataset_short.csv', 'r') as file:
+        with open('datasets/dataset_test.csv', 'r') as file:
             csvreader = csv.reader(file)
             headers = next(csvreader)
+            
             for header in headers:
+                self.header.append(header)
                 self.data[header] = []
             
+            self.setArg()
             for line in csvreader:
-                for index, value in enumerate(line):
-                    if is_digit(value):
-                        self.data[headers[index]].append(ceil(float(value)))
+                if line[self.x_feature] and is_digit(line[self.x_feature]) and line[self.y_feature] and is_digit(line[self.y_feature]):
+                    self.data[headers[self.x_feature]].append(float(line[self.x_feature]))
+                    self.data[headers[self.y_feature]].append(float(line[self.y_feature]))
         
     def makeScatter(self):
-        x_feature = 'Astronomy'
-        y_feature = 'Flying'
-        min_length = min(len(self.data[x_feature]), len(self.data[y_feature]))
+        plt.scatter(self.data[self.header[self.x_feature]], self.data[self.header[self.y_feature]])
 
-        plt.scatter(self.data[x_feature][:min_length], self.data[y_feature][:min_length])
-
-        plt.title(f"Relation entre {x_feature} et {y_feature}")
-        plt.xlabel(x_feature)
-        plt.ylabel(y_feature)
+        plt.title(f"Relation entre {self.header[self.x_feature]} et {self.header[self.y_feature]}")
+        plt.xlabel(self.header[self.x_feature])
+        plt.ylabel(self.header[self.y_feature])
 
         plt.show()
         
