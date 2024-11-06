@@ -1,6 +1,9 @@
 import re
 import sys
 import csv
+import os.path
+import LowMathLib
+import pandas as pd
 import matplotlib.pyplot as plt
 from math import *
 
@@ -11,55 +14,69 @@ class Histogram:
         self.argv = sys.argv
         self.data = {}
         self.res = {}
-        if len(self.argv) == 3 and sys.argv[2] in ['Arithmancy', 'Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Potions', 'Care of Magical Creatures', 'Charms', 'Flying']:
-            self.classe = sys.argv[2]
-        else :
-            self.classe = 'Arithmancy'
+        self.classe = ""
 
     def parser(self):
-        print("[Command] ./python3 histogram.py [ARG REQUIRED] file.csv [ARG OPTIONNAL] Classes")
-        print("[Classes] Arithmancy, Astronomy, Herbology, Defense Against the Dark Arts, Divination, Muggle Studies, Ancient Runes, History of Magic, Transfiguration, Potions, Care of Magical Creatures, Charms, Flying")
-        if len(self.argv) != 2 and len(self.argv) != 3:
-            print("[Error] Need 1 or 2 args ...")
+        if len(self.argv) < 2 or len(self.argv) > 2:
+            print("[Command] ./python3 histogram.py [ARG REQUIRED] file.csv")
             sys.exit()
-            
-        with open(self.argv[1], 'r') as file:
-            csvreader = csv.reader(file)
-            headers = next(csvreader)
-            
-            self.data['Ravenclaw'] = {}
-            self.data['Slytherin'] = {}
-            self.data['Gryffindor'] = {}
-            self.data['Hufflepuff'] = {}
-            
-            for house in self.data :
-                for header in headers:
-                    self.data[house][header] = []
-            
-            for line in csvreader:
-                for index, value in enumerate(line):
-                    if is_digit(value) and line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
-                        value = float(value)
-                        self.data[line[1]][headers[index]].append(ceil(value))
+        elif len(self.argv) == 2:
+            if os.path.exists(self.argv[1]):
+                if os.access(self.argv[1], os.R_OK):   
+                    with open(self.argv[1], 'r') as file:
+                        csvreader = csv.reader(file)
+                        headers = next(csvreader)
+                        
+                        self.data['Ravenclaw'] = {}
+                        self.data['Slytherin'] = {}
+                        self.data['Gryffindor'] = {}
+                        self.data['Hufflepuff'] = {}
+                        
+                        for house in self.data :
+                            for header in headers:
+                                self.data[house][header] = []
+                        
+                        for line in csvreader:
+                            for index, value in enumerate(line):
+                                if is_digit(value) and line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                    value = float(value)
+                                    self.data[line[1]][headers[index]].append(value)
+                else:
+                    print("[Error] Vous ne disposez pas des permissions nécessairess pour lire ce fichier.")
+                    sys.exit()
+            else:
+                print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
+                sys.exit()
                         
     def makeHistogram(self):
-        histogram = {}
+        self.classe = get_classe(self.data)
+        histogram = []
         for house, house_data in self.data.items():
+            house_value = []
             for header, values in house_data.items():
                 if self.classe == header:
-                    histogram[house] = values
- 
-        plt.hist(histogram["Ravenclaw"], bins=20, alpha=0.5, label='Ravenclaw', color='blue')
-        plt.hist(histogram["Slytherin"], bins=20, alpha=0.5, label='Slytherin', color='red')
-        plt.hist(histogram["Gryffindor"], bins=20, alpha=0.5, label='Gryffindor', color='yellow')
-        plt.hist(histogram["Hufflepuff"], bins=20, alpha=0.5, label='Hufflepuff', color='green')
-        
-        plt.xlabel("Values")
-        plt.ylabel("Frequence")
-        plt.legend(title="Maisons de Poudlard", title_fontsize='13', loc='upper right')
+                    histogram.append(values)
+
         plt.title(self.classe, fontsize=14)
+        plt.hist(histogram, stacked=True, color=['orange', 'green','blue','red'])
+        plt.xlabel("Notes")
+        plt.ylabel("Nombres d'élèves")
         plt.show()
-            
+
+def get_classe(data):
+    lib = LowMathLib.LowMathLib()
+    min_ = lib.ft_std_dev(data['Ravenclaw']['Index'])
+    for key, value in data.items():
+        for key_value, value_value in value.items():
+            if key_value not in ['Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
+                try:
+                    tmp = lib.ft_std_dev(value_value)
+                    if min_ > tmp:
+                        min_ = tmp
+                        feature = key_value
+                except:
+                    continue
+    return feature            
 
 def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
