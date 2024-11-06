@@ -10,9 +10,10 @@ class Scatter_plot:
     def __init__(self):
         self.argv = sys.argv
         self.column = []
-        self.x_feature = 0
-        self.y_feature = 0
+        self.feature1 = 0
+        self.feature2 = 0
         self.data = {}
+        self.rawdata = {}
         self.res = {}
         self.header = []
         
@@ -26,23 +27,28 @@ class Scatter_plot:
                     with open(self.argv[1], 'r') as file:
                         csvreader = csv.reader(file)
                         headers = next(csvreader)
+
+                        self.rawdata['Ravenclaw'] = {}
+                        self.rawdata['Slytherin'] = {}
+                        self.rawdata['Gryffindor'] = {}
+                        self.rawdata['Hufflepuff'] = {}
                         
-                        self.data['Ravenclaw'] = {}
-                        self.data['Slytherin'] = {}
-                        self.data['Gryffindor'] = {}
-                        self.data['Hufflepuff'] = {}
-                        
-                        for house in self.data :
+                        for house in self.rawdata:
                             for header in headers:
-                                self.data[house][header] = []
+                                self.data[header] = []
+                                self.rawdata[house][header] = []
 
                         for line in csvreader:
                             for index, value in enumerate(line):
-                                if is_digit(value) and line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                if is_digit(value):
                                     value = float(value)
-                                    self.data[line[1]][headers[index]].append(value)
-                                elif not value and line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
-                                    self.data[line[1]][headers[index]].append(float("nan"))
+                                    self.data[headers[index]].append(value)
+                                    if line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                        self.rawdata[line[1]][headers[index]].append(value)
+                                elif not value:
+                                    self.data[headers[index]].append(float("nan"))
+                                    if line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                        self.rawdata[line[1]][headers[index]].append(float("nan"))
                 else:
                     print("[Error] Vous ne disposez pas des permissions nécessairess pour lire ce fichier.")
                     sys.exit()
@@ -50,38 +56,37 @@ class Scatter_plot:
                 print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
                 sys.exit()
 
-    def makeScatter(self):
-        size = 0
-        for house, house_data in self.data.items():
-            for header, values in house_data.items():
-                if header not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
-                    size += 1
-            break
-        i = 1
-        plt.style.use('classic')
-        fig = plt.figure(figsize=(24,13))
-        for house, house_data in self.data.items():
-            for header_axis, values_axis in house_data.items():
-                if header_axis not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
-                    for header_ordo, values_ordo in house_data.items():
-                        if header_ordo not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
-                            ax = fig.add_subplot(size, size, i)
-                            if (i <= size):
-                                ax.set_title(header_ordo[0:9])
-                            if (i % size == 1):
-                                ax.set_ylabel(header_axis[0:7])
-                            ax.set_yticklabels([])
-                            ax.set_xticklabels([])
-                            fill_scatter_plot(ax, self.data, header_axis, header_ordo)
-                            i += 1
-            break
-        plt.show()
+    def find_similar_features(self):
+        max_corr = 0
+        features = []
+        similar_pair = (None, None)
+        lib = LowMathLib.LowMathLib()
+        
+        for feature in self.data.keys():
+            if feature not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
+                features.append(feature)
+        for i in range(len(features)):
+            for j in range(len(features)):
+                if (i != j):
+                    corr = abs(lib.calculate_correlation(self.data[features[i]], self.data[features[j]]))
+                    if corr > max_corr:
+                        max_corr = corr
+                        similar_pair = (features[i], features[j])
+        self.feature1 = similar_pair[0]
+        self.feature2 = similar_pair[1]
 
-def fill_scatter_plot(ax, data, class_1, class_2):
-    houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
-    colors = ['orange', 'green','blue','red']
-    for house, color in zip(houses, colors):
-        ax.scatter(data[house][class_1], data[house][class_2], color=color)
+    def makeScatter(self):
+        fig = plt.figure(figsize=(8,6))
+        ax = fig.add_subplot(1,1,1)
+        houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+        colors = ['orange', 'green','blue','red']
+        for house, color in zip(houses, colors):
+            ax.scatter(self.rawdata[house][self.feature1], self.rawdata[house][self.feature2], color=color)
+        plt.title(f'Scatter plot of {self.feature1} vs {self.feature2}')
+        plt.xlabel(self.feature1)
+        plt.ylabel(self.feature2)
+        plt.grid(True)
+        plt.show()
 
 def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
@@ -90,4 +95,5 @@ def is_digit(chaine):
 if __name__ == "__main__":
     SCAT = Scatter_plot()
     SCAT.parser()
+    SCAT.find_similar_features()
     SCAT.makeScatter()

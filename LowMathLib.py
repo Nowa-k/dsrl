@@ -47,3 +47,25 @@ class LowMathLib:
         q3 = sorted_values[int(q3_pos)]
 
         return q1, q3
+
+    @staticmethod
+    def calculate_correlation(x, y):
+        valid_pairs = [(xi, yi) for xi, yi in zip(x, y) if xi == xi and yi == yi]
+
+        if len(valid_pairs) < 2:
+            return None
+        
+        x_filtered, y_filtered = zip(*valid_pairs)
+        n = len(x_filtered)
+
+        mean_x = sum(x_filtered) / n
+        mean_y = sum(y_filtered) / n
+
+        numerator = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x_filtered, y_filtered))
+        denominator_x = sum((xi - mean_x) ** 2 for xi in x_filtered) ** 0.5
+        denominator_y = sum((yi - mean_y) ** 2 for yi in y_filtered) ** 0.5
+
+        if denominator_x == 0 or denominator_y == 0:
+            return None
+
+        return numerator / (denominator_x * denominator_y)
