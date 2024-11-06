@@ -3,7 +3,6 @@ import sys
 import csv
 import os.path
 import LowMathLib
-import pandas as pd
 import matplotlib.pyplot as plt
 from math import *
 
@@ -64,6 +63,7 @@ class Histogram:
         plt.show()
 
 def get_classe(data):
+    print(data)
     lib = LowMathLib.LowMathLib()
     min_ = lib.ft_std_dev(data['Ravenclaw']['Index'])
     for key, value in data.items():
