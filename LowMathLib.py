@@ -1,3 +1,5 @@
+import numpy as np
+
 class LowMathLib:
     @staticmethod
     def ft_min(tab):
@@ -69,3 +71,15 @@ class LowMathLib:
             return None
 
         return numerator / (denominator_x * denominator_y)
+    
+    @staticmethod
+    def min_max(values):
+        min_ = min(values)
+        max_ = max(values)
+        for index in range(len(values)):
+            if (max_ - min_) != 0:
+                values[index] = ((values[index] - min_) / (max_ - min_))
+
+    @staticmethod
+    def sigmoid(z):
+        return (1 / (1 + np.exp(-z)))
