@@ -72,16 +72,29 @@ class Pair_plot:
                                 ax.set_ylabel(header_axis[0:7])
                             ax.set_yticklabels([])
                             ax.set_xticklabels([])
-                            fill_scatter_plot(ax, self.data, header_axis, header_ordo)
+                            if header_axis != header_ordo:
+                                fill_scatter_plot(ax, self.data, header_axis, header_ordo)
+                            else:
+                                fill_histogram(ax, self.data, header_axis)
                             i += 1
             break
         plt.show()
+
+def fill_histogram(ax, data, classe):
+    histogram = []
+    for house, house_data in data.items():
+        house_value = []
+        for header, values in house_data.items():
+            if classe == header:
+                histogram.append(values)
+
+    ax.hist(histogram, stacked=True, color=['orange', 'green','blue','red'])
 
 def fill_scatter_plot(ax, data, class_1, class_2):
     houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
     colors = ['orange', 'green','blue','red']
     for house, color in zip(houses, colors):
-        ax.scatter(data[house][class_1], data[house][class_2], color=color)
+        ax.scatter(data[house][class_1], data[house][class_2], s=4, color=color)
 
 def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
