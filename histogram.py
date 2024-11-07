@@ -63,7 +63,6 @@ class Histogram:
         plt.show()
 
 def get_classe(data):
-    print(data)
     lib = LowMathLib.LowMathLib()
     min_ = lib.ft_std_dev(data['Ravenclaw']['Index'])
     for key, value in data.items():
