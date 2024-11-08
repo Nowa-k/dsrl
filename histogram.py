@@ -9,12 +9,13 @@ from math import *
 class Histogram:
     
     def __init__(self):
-        self.column = []
-        self.argv = sys.argv
-        self.data = {}
         self.res = {}
+        self.data = {}
+        self.column = []
         self.classe = ""
+        self.argv = sys.argv
 
+    # Parse data
     def parser(self):
         if len(self.argv) < 2 or len(self.argv) > 2:
             print("[Command] ./python3 histogram.py [ARG REQUIRED] file.csv")
@@ -35,6 +36,7 @@ class Histogram:
                             for header in headers:
                                 self.data[house][header] = []
                         
+                        # Add the data for each house and each classe
                         for line in csvreader:
                             for index, value in enumerate(line):
                                 if is_digit(value) and line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
@@ -46,7 +48,8 @@ class Histogram:
             else:
                 print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
                 sys.exit()
-                        
+
+    # Draw the Histogram                    
     def makeHistogram(self):
         self.classe = get_classe(self.data)
         histogram = []
@@ -62,6 +65,7 @@ class Histogram:
         plt.ylabel("Nombres d'élèves")
         plt.show()
 
+# Get the class with a homogeneous score
 def get_classe(data):
     lib = LowMathLib.LowMathLib()
     min_ = lib.ft_std_dev(data['Ravenclaw']['Index'])

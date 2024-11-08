@@ -16,7 +16,8 @@ class Scatter_plot:
         self.rawdata = {}
         self.res = {}
         self.header = []
-        
+    
+    # Parse data
     def parser(self):
         if len(self.argv) < 2 or len(self.argv) > 2:
             print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] file.csv")
@@ -56,6 +57,7 @@ class Scatter_plot:
                 print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
                 sys.exit()
 
+    # Find the features who are similars
     def find_similar_features(self):
         max_corr = 0
         features = []
@@ -75,6 +77,7 @@ class Scatter_plot:
         self.feature1 = similar_pair[0]
         self.feature2 = similar_pair[1]
 
+    # Draw the scatter plot
     def makeScatter(self):
         fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(1,1,1)
@@ -92,6 +95,7 @@ def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
     return bool(re.match(pattern, chaine))
 
+# Main
 if __name__ == "__main__":
     SCAT = Scatter_plot()
     SCAT.parser()

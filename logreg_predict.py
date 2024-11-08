@@ -15,6 +15,7 @@ class Predict:
         self.lib = LowMathLib.LowMathLib()
         self.classes = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
 
+    # Parse arguments
     def parser(self):
         if len(self.argv) < 2 or len(self.argv) > 3:
             print("[Command] ./python3 logreg_predict.py [ARG REQUIRED] [PATH TO]/dataset_test.csv [ARG REQUIRED] weighs file")
@@ -42,6 +43,7 @@ class Predict:
                 print("[Error] Le nom du fichier doit être: 'dataset_test.csv'")
                 sys.exit()
 
+    # Predicct the houses with the trained data
     def predict(self):
         X = self.data[self.classes].to_numpy()
         X = np.hstack((np.ones((X.shape[0], 1)), X))
@@ -52,6 +54,7 @@ class Predict:
             probs = {cls: lib.sigmoid(np.dot(X[i], np.array(weights))) for cls, weights in weights.items()}
             self.predictions.append(max(probs, key=probs.get))
 
+    # Normalize informations to be between 0 and 1
     def normalization(self):
         lib = LowMathLib.LowMathLib()
         for classe in self.classes:
@@ -59,6 +62,7 @@ class Predict:
             max_val = self.lib.ft_max(self.data[classe])
             self.data[classe] = (self.data[classe] - min_val) / (max_val - min_val)
     
+    # Write the results in houses.csv
     def output(self):
         with open('houses.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
@@ -66,6 +70,7 @@ class Predict:
             for i in range(len(self.predictions)):
                 writer.writerow([str(i), self.predictions[i]])
 
+# Main
 if __name__ == "__main__":
     PREDICT = Predict()
     PREDICT.parser()

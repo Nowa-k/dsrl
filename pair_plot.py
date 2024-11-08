@@ -8,14 +8,15 @@ from math import *
 
 class Pair_plot:
     def __init__(self):
-        self.argv = sys.argv
+        self.res = {}
+        self.data = {}
         self.column = []
+        self.header = []
         self.x_feature = 0
         self.y_feature = 0
-        self.data = {}
-        self.res = {}
-        self.header = []
-        
+        self.argv = sys.argv
+    
+    # Parse data
     def parser(self):
         if len(self.argv) < 2 or len(self.argv) > 2:
             print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] file.csv")
@@ -50,6 +51,7 @@ class Pair_plot:
                 print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
                 sys.exit()
 
+    # Calculate all the similarities for each classes
     def makeScatterMatrix(self):
         size = 0
         for house, house_data in self.data.items():
@@ -61,11 +63,15 @@ class Pair_plot:
         plt.style.use('classic')
         fig = plt.figure(figsize=(24,13))
         for house, house_data in self.data.items():
+            axis = 0
             for header_axis, values_axis in house_data.items():
                 if header_axis not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
+                    ordo = 0
                     for header_ordo, values_ordo in house_data.items():
                         if header_ordo not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
                             ax = fig.add_subplot(size, size, i)
+                            if ordo > axis:
+                                ax.set_visible(False)
                             if (i <= size):
                                 ax.set_title(header_ordo[0:9])
                             if (i % size == 1):
@@ -77,9 +83,12 @@ class Pair_plot:
                             else:
                                 fill_histogram(ax, self.data, header_axis)
                             i += 1
+                            ordo += 1
+                    axis += 1
             break
         plt.show()
 
+# Draw the Histograms
 def fill_histogram(ax, data, classe):
     histogram = []
     for house, house_data in data.items():
@@ -90,6 +99,7 @@ def fill_histogram(ax, data, classe):
 
     ax.hist(histogram, stacked=True, color=['orange', 'green','blue','red'])
 
+# Draw the scatters
 def fill_scatter_plot(ax, data, class_1, class_2):
     houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
     colors = ['orange', 'green','blue','red']
@@ -100,6 +110,7 @@ def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
     return bool(re.match(pattern, chaine))
 
+# Main
 if __name__ == "__main__":
     PAIR = Pair_plot()
     PAIR.parser()

@@ -16,6 +16,7 @@ class Train:
         self.lib = LowMathLib.LowMathLib()
         self.classes = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
 
+    # Parse arguments
     def parser(self):
         if len(self.argv) < 2 or len(self.argv) > 2:
             print("[Command] ./python3 logreg_predict.py [ARG REQUIRED] [PATH TO]/dataset_train.csv")
@@ -43,7 +44,7 @@ class Train:
                 print("[Error] Le nom du fichier doit être: 'dataset_train.csv'")
                 sys.exit()
 
-
+    # Normalize informations to be between 0 and 1
     def normalization(self):
         lib = LowMathLib.LowMathLib()
         for classe in self.classes:
@@ -51,6 +52,7 @@ class Train:
             max_val = self.lib.ft_max(self.data[classe])
             self.data[classe] = (self.data[classe] - min_val) / (max_val - min_val)
 
+    # Train the AI with gradiant descent function
     def train(self):
         lib = LowMathLib.LowMathLib()
         X = self.data[self.classes].to_numpy()
@@ -62,10 +64,12 @@ class Train:
             weight = gradient_descent(X, y, weight, 0.025, 1500)
             self.weights[house] = weight.tolist()
     
+    # Write weights in a json
     def output(self):
         with open("weights.json", "w") as f:
             json.dump(self.weights, f)
 
+# The Gradient Descent logic
 def gradient_descent(X, y, weight, alpha, iterations):
     lib = LowMathLib.LowMathLib()
     m = len(y)
@@ -75,6 +79,7 @@ def gradient_descent(X, y, weight, alpha, iterations):
         weight -= alpha * gradient
     return weight
 
+# Main
 if __name__ == "__main__":
     TRAIN = Train()
     TRAIN.parser()
