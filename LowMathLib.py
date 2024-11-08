@@ -19,13 +19,13 @@ class LowMathLib:
 
     @staticmethod
     def ft_mean(values):
-            return sum(values) / len(values) if values else 0
+        return sum(values) / len(values) if values else 0
 
     @staticmethod
     def ft_std_dev(values):
-            mean_val = LowMathLib.ft_mean(values)
-            variance = sum((x - mean_val) ** 2 for x in values) / (len(values) - 1) if len(values) > 1 else 0
-            return variance ** 0.5
+        mean_val = LowMathLib.ft_mean(values)
+        variance = sum((x - mean_val) ** 2 for x in values) / (len(values) - 1) if len(values) > 1 else 0
+        return variance ** 0.5
     
     @staticmethod
     def ft_median(values):
@@ -71,15 +71,13 @@ class LowMathLib:
             return None
 
         return numerator / (denominator_x * denominator_y)
-    
+
     @staticmethod
-    def min_max(values):
-        min_ = min(values)
-        max_ = max(values)
-        for index in range(len(values)):
-            if (max_ - min_) != 0:
-                values[index] = ((values[index] - min_) / (max_ - min_))
+    def cost(X, y, theta):
+        m = len(y)
+        h = sigmoid(X.dot(theta))
+        return (-1 / m) * (y.T.dot(np.log(h)) + (1 - y).T.dot(np.log(1 - h)))
 
     @staticmethod
     def sigmoid(z):
-        return (1 / (1 + np.exp(-z)))
+        return 1 / (1 + np.exp(-z))
