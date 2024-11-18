@@ -61,7 +61,7 @@ class Pair_plot:
             break
         i = 1
         plt.style.use('classic')
-        fig = plt.figure(figsize=(24,13))
+        fig = plt.figure(figsize=(45,30))
         for house, house_data in self.data.items():
             axis = 0
             for header_axis, values_axis in house_data.items():
@@ -70,12 +70,12 @@ class Pair_plot:
                     for header_ordo, values_ordo in house_data.items():
                         if header_ordo not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
                             ax = fig.add_subplot(size, size, i)
+                            if axis == ordo:
+                                ax.set_title(header_ordo, fontsize=20)
                             if ordo > axis:
                                 ax.set_visible(False)
-                            if (i <= size):
-                                ax.set_title(header_ordo[0:9])
                             if (i % size == 1):
-                                ax.set_ylabel(header_axis[0:7])
+                                ax.set_ylabel(header_axis[0:9], fontsize=20)
                             ax.set_yticklabels([])
                             ax.set_xticklabels([])
                             if header_axis != header_ordo:
