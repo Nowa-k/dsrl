@@ -44,6 +44,29 @@ class Train:
                 print("[Error] Le nom du fichier doit être: 'dataset_train.csv'")
                 sys.exit()
 
+    #Calc the precision of the algorythm
+    def calc_precision(self):
+        predictions = []
+        precisionData = []
+        total = 0
+        X = self.data[self.classes].to_numpy()
+        X = np.hstack((np.ones((X.shape[0], 1)), X))
+        lib = LowMathLib.LowMathLib()
+        with open("weights.json", "r") as f:
+            weights = json.load(f)
+        with open("datasets/dataset_train.csv", "r") as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                    precisionData.append(row[1])
+        for i in range(X.shape[0]):
+            probs = {cls: lib.sigmoid(np.dot(X[i], np.array(weights))) for cls, weights in weights.items()}
+            predictions.append(max(probs, key=probs.get))
+        for i in range(len(predictions)):
+            if predictions[i] == precisionData[i]:
+                total += 1
+        print((total / len(predictions)) * 100)
+
     # Normalize informations to be between 0 and 1
     def normalization(self):
         lib = LowMathLib.LowMathLib()
@@ -86,3 +109,4 @@ if __name__ == "__main__":
     TRAIN.normalization()
     TRAIN.train()
     TRAIN.output()
+    #TRAIN.calc_precision()
