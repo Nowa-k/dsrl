@@ -14,11 +14,19 @@ class Scatter_plot:
         self.header = []
         
     def setArg(self):
-        self.x_feature = self.header.index(sys.argv[1])
-        self.y_feature = self.header.index(sys.argv[2])
+        try :
+            self.x_feature = self.header.index(sys.argv[1])
+            self.y_feature = self.header.index(sys.argv[2])
+        except ValueError:
+            print("This classe doesn't exist")
+            sys.exit()
            
     def parser(self):
-        print("[Command] ./python3 scatter_plot.py classe classe")
+        print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] Classes Classes")
+        print("[Classes] Arithmancy, Astronomy, Herbology, Defense Against the Dark Arts, Divination, Muggle Studies, Ancient Runes, History of Magic, Transfiguration, Potions, Care of Magical Creatures, Charms, Flying")
+        if len(sys.argv) != 3:
+            print("[Error] You need 2 args")
+            sys.exit()
             
         with open('datasets/dataset_test.csv', 'r') as file:
             csvreader = csv.reader(file)
