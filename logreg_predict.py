@@ -17,7 +17,7 @@ class Predict:
 
     # Parse arguments
     def parser(self):
-        if len(self.argv) < 2 or len(self.argv) > 3:
+        if len(self.argv) != 3:
             print("[Command] ./python3 logreg_predict.py [ARG REQUIRED] [PATH TO]/dataset_test.csv [ARG REQUIRED] weighs file")
             sys.exit()
         elif len(self.argv) == 3:

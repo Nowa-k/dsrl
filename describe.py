@@ -58,6 +58,8 @@ class Describe:
                 max_val = round(lib.ft_max(values), 3)
                 q1, q3 = lib.ft_quartiles(values)
                 median = round(lib.ft_median(values), 3)
+                under_mean = lib.ft_underMean(values, mean)
+                over_mean = lib.ft_overMean(values, mean)
                 
                 stats = {
                     'Count': count,
@@ -67,14 +69,16 @@ class Describe:
                     '25%': q1,
                     '50%': median,
                     '75%': q3,
-                    'Max': max_val
+                    'Max': max_val,
+                    'underMean': under_mean,
+                    'overMean': over_mean
                 }
 
                 self.res[column] = stats
                 
     
     def printRes(self):
-        header, count, mean, std, min, q1, q2, q3, max = [""], ["Count"], ["Mean"], ["Std"], ["Min"], ["25%"], ["50%"], ["75%"], ["Max"]
+        header, count, mean, std, min, q1, q2, q3, max, underMean, overMean = [""], ["Count"], ["Mean"], ["Std"], ["Min"], ["25%"], ["50%"], ["75%"], ["Max"], ["underMean"], ["overMean"]
         
         for res, value in self.res.items():
             header = header + [(f"{res}")]
@@ -96,8 +100,12 @@ class Describe:
                         q3 = q3 + [f"{v}"]
                     case 'Max':
                         max = max + [f"{v}"]
+                    case 'underMean':
+                        underMean = underMean + [f"{v}"]
+                    case 'overMean':
+                        overMean = overMean + [f"{v}"]
                 
-        print(tabulate([header, count, mean, std, min, q1, q2, q3, max]))
+        print(tabulate([header, count, mean, std, min, q1, q2, q3, max, underMean, overMean]))
 
 def verifyChunk(values):
     values = [x for x in values if x not in ('', None)]

@@ -51,6 +51,22 @@ class LowMathLib:
         return q1, q3
 
     @staticmethod
+    def ft_underMean(values, mean):
+        count = 0
+        for value in values:
+            if value < mean:
+                count += 1
+        return count
+
+    @staticmethod
+    def ft_overMean(values, mean):
+        count = 0
+        for value in values:
+            if value > mean:
+                count += 1
+        return count
+
+    @staticmethod
     def calculate_correlation(x, y):
         valid_pairs = [(xi, yi) for xi, yi in zip(x, y) if xi == xi and yi == yi]
 
