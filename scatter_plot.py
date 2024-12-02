@@ -1,17 +1,23 @@
 import re
 import sys
 import csv
+import os.path
+import LowMathLib
 import matplotlib.pyplot as plt
 from math import *
 
 class Scatter_plot:
     def __init__(self):
+        self.argv = sys.argv
         self.column = []
-        self.x_feature = 0
-        self.y_feature = 0
+        self.feature1 = 0
+        self.feature2 = 0
         self.data = {}
+        self.rawdata = {}
         self.res = {}
         self.header = []
+    
+    # Parse data
         
     def setArg(self):
         try :
@@ -22,40 +28,85 @@ class Scatter_plot:
             sys.exit()
            
     def parser(self):
-        print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] Classes Classes")
-        print("[Classes] Arithmancy, Astronomy, Herbology, Defense Against the Dark Arts, Divination, Muggle Studies, Ancient Runes, History of Magic, Transfiguration, Potions, Care of Magical Creatures, Charms, Flying")
-        if len(sys.argv) != 3:
-            print("[Error] You need 2 args")
+        if len(self.argv) < 2 or len(self.argv) > 2:
+            print("[Command] ./python3 scatter_plot.py [ARG REQUIRED] file.csv")
             sys.exit()
-            
-        with open('datasets/dataset_test.csv', 'r') as file:
-            csvreader = csv.reader(file)
-            headers = next(csvreader)
-            
-            for header in headers:
-                self.header.append(header)
-                self.data[header] = []
-            
-            self.setArg()
-            for line in csvreader:
-                if line[self.x_feature] and is_digit(line[self.x_feature]) and line[self.y_feature] and is_digit(line[self.y_feature]):
-                    self.data[headers[self.x_feature]].append(float(line[self.x_feature]))
-                    self.data[headers[self.y_feature]].append(float(line[self.y_feature]))
+        elif len(self.argv) == 2:
+            if os.path.exists(self.argv[1]):
+                if os.access(self.argv[1], os.R_OK):   
+                    with open(self.argv[1], 'r') as file:
+                        csvreader = csv.reader(file)
+                        headers = next(csvreader)
+
+                        self.rawdata['Ravenclaw'] = {}
+                        self.rawdata['Slytherin'] = {}
+                        self.rawdata['Gryffindor'] = {}
+                        self.rawdata['Hufflepuff'] = {}
+                        
+                        for house in self.rawdata:
+                            for header in headers:
+                                self.data[header] = []
+                                self.rawdata[house][header] = []
+
+                        for line in csvreader:
+                            for index, value in enumerate(line):
+                                if is_digit(value):
+                                    value = float(value)
+                                    self.data[headers[index]].append(value)
+                                    if line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                        self.rawdata[line[1]][headers[index]].append(value)
+                                elif not value:
+                                    self.data[headers[index]].append(float("nan"))
+                                    if line[1] in ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']:
+                                        self.rawdata[line[1]][headers[index]].append(float("nan"))
+                else:
+                    print("[Error] Vous ne disposez pas des permissions nécessairess pour lire ce fichier.")
+                    sys.exit()
+            else:
+                print("[Error] Le fichier est introuvable. Etes-vous sûrs du chemin d'accès?")
+                sys.exit()
+
+    # Find the features who are similars
+    def find_similar_features(self):
+        max_corr = 0
+        features = []
+        similar_pair = (None, None)
+        lib = LowMathLib.LowMathLib()
         
+        for feature in self.data.keys():
+            if feature not in ['Index', 'Hogwarts House', 'First Name', 'Last Name', 'Birthday', 'Best Hand']:
+                features.append(feature)
+        for i in range(len(features)):
+            for j in range(len(features)):
+                if (i != j):
+                    corr = abs(lib.calculate_correlation(self.data[features[i]], self.data[features[j]]))
+                    if corr > max_corr:
+                        max_corr = corr
+                        similar_pair = (features[i], features[j])
+        self.feature1 = similar_pair[0]
+        self.feature2 = similar_pair[1]
+
+    # Draw the scatter plot
     def makeScatter(self):
-        plt.scatter(self.data[self.header[self.x_feature]], self.data[self.header[self.y_feature]])
-
-        plt.title(f"Relation entre {self.header[self.x_feature]} et {self.header[self.y_feature]}")
-        plt.xlabel(self.header[self.x_feature])
-        plt.ylabel(self.header[self.y_feature])
-
+        fig = plt.figure(figsize=(8,6))
+        ax = fig.add_subplot(1,1,1)
+        houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+        colors = ['orange', 'green','blue','red']
+        for house, color in zip(houses, colors):
+            ax.scatter(self.rawdata[house][self.feature1], self.rawdata[house][self.feature2], color=color)
+        plt.title(f'Scatter plot of {self.feature1} vs {self.feature2}')
+        plt.xlabel(self.feature1)
+        plt.ylabel(self.feature2)
+        plt.grid(True)
         plt.show()
-        
+
 def is_digit(chaine):
     pattern = r"^-?\d*\.?\d+$"
     return bool(re.match(pattern, chaine))
 
+# Main
 if __name__ == "__main__":
     SCAT = Scatter_plot()
     SCAT.parser()
+    SCAT.find_similar_features()
     SCAT.makeScatter()
