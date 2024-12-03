@@ -14,6 +14,7 @@ class Predict:
         self.predictions = []
         self.lib = LowMathLib.LowMathLib()
         self.classes = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
+        self.classes = ["Astronomy", "Herbology", "Defense Against the Dark Arts", "Ancient Runes", "Charms"]
 
     # Parse arguments
     def parser(self):

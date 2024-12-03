@@ -14,7 +14,7 @@ class Train:
         self.weights = {}
         self.argv = sys.argv
         self.lib = LowMathLib.LowMathLib()
-        self.classes = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
+        self.classes = ["Astronomy", "Herbology", "Defense Against the Dark Arts", "Ancient Runes", "Charms"]
 
     # Parse arguments
     def parser(self):
@@ -84,7 +84,7 @@ class Train:
         for house in houses:
             y = (self.data['Hogwarts House'] == house).astype(int).values
             weight = np.zeros(X.shape[1])
-            weight = gradient_descent(X, y, weight, 0.025, 1500)
+            weight = gradient_descent(X, y, weight, 0.025, 2500)
             self.weights[house] = weight.tolist()
     
     # Write weights in a json
